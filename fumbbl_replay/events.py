@@ -317,20 +317,10 @@ def extract_events(replay: dict[str, Any]) -> list[Event]:
                 is_blitz_now = (current_action or "").lower() in ("blitz", "blitzmove")
                 if ones == len(roll) and len(roll) >= 2:
                     # All dice are skulls — pure attacker disaster.
+                    # 2-of-2 or 3-of-3 only; mixed rolls with skulls don't count.
                     kind = "triple_skull" if len(roll) >= 3 else "double_skull"
                     events.append(Event(
                         kind=kind, side=active_side, command_nr=cn,
-                        half=half, turn=active_turn,
-                        score_home=score_home, score_away=score_away,
-                        player_id=acting_player_id,
-                        detail=",".join(str(v) for v in roll),
-                        was_blitz=is_blitz_now,
-                        blitz_target_id=defender_id if is_blitz_now else None,
-                    ))
-                elif ones >= 2:
-                    # Mixed roll with 2+ skulls (e.g. [1, 1, 4]) — still a blunder
-                    events.append(Event(
-                        kind="double_skull", side=active_side, command_nr=cn,
                         half=half, turn=active_turn,
                         score_home=score_home, score_away=score_away,
                         player_id=acting_player_id,
