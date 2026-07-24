@@ -95,6 +95,9 @@ python -m fumbbl_replay 4700842 --tableaux out/tableaux --no-sprites
 
 # Skip the replay step, use just summary totals (no player names, no turn)
 python -m fumbbl_replay 1901135 --no-replay
+
+# kills report
+python -m fumbbl_replay 1901135 --kill
 ```
 
 A self-contained project showcase (with embedded sample tableaux and

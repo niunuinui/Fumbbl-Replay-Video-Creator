@@ -534,7 +534,8 @@ def _td(team: TeamInfo, opp: TeamInfo) -> PivotalPlay:
     )
 
 
-def format_report(a: MatchAnalysis, *, commentary: dict[int, str] | None = None) -> str:
+def format_report(a: MatchAnalysis, *, commentary: dict[int, str] | None = None,
+                  only_kills: bool = False) -> str:
     commentary = commentary or {}
     lines = [
         "",
@@ -557,10 +558,13 @@ def format_report(a: MatchAnalysis, *, commentary: dict[int, str] | None = None)
 
     lines.append("")
     src = "replay event log" if a.has_event_log else "summary totals"
-    lines.append(f"  Pivotal plays ({len(a.pivotal)}, in match order, from {src}):")
-    if not a.pivotal:
+    plays = a.pivotal
+    if only_kills:
+        plays = [p for p in plays if p.kind == "casualty" and p.detail and p.detail.lower() == "rip"]
+    lines.append(f"  Pivotal plays ({len(plays)}, in match order, from {src}):")
+    if not plays:
         lines.append("    (no scoring or casualties recorded)")
-    for i, p in enumerate(a.pivotal, 1):
+    for i, p in enumerate(plays, 1):
         lines.append(f"    {i:2d}. [{p.weight:.2f}] {p.headline()}")
         if i in commentary:
             lines.append(f"        “{commentary[i]}”")

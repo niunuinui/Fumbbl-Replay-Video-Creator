@@ -228,12 +228,15 @@ def extract_events(replay: dict[str, Any]) -> list[Event]:
                 ))
             elif mid == "teamResultSetRipSuffered" and side in ("home", "away"):
                 meta = send_box.get(victim or "", {})
+                inflicter = meta.get("by")
+                if not inflicter and current_action and current_action.lower() in ("block", "blitz", "blitzmove", "foul"):
+                    inflicter = acting_player_id
                 events.append(Event(
                     kind="kill", side=side, command_nr=cn,
                     half=half, turn=event_turn,
                     score_home=score_home, score_away=score_away,
                     player_id=victim, detail=injury_label,
-                    inflicter_id=meta.get("by"),
+                    inflicter_id=inflicter,
                     reason=meta.get("reason"),
                     was_blitz=is_blitz_now,
                     blitz_target_id=victim if is_blitz_now else None,
@@ -242,12 +245,15 @@ def extract_events(replay: dict[str, Any]) -> list[Event]:
                 if injury_label and "RIP" in injury_label.upper():
                     continue  # already emitted as kill
                 meta = send_box.get(victim or "", {})
+                inflicter = meta.get("by")
+                if not inflicter and current_action and current_action.lower() in ("block", "blitz", "blitzmove", "foul"):
+                    inflicter = acting_player_id
                 events.append(Event(
                     kind="serious_injury", side=side, command_nr=cn,
                     half=half, turn=event_turn,
                     score_home=score_home, score_away=score_away,
                     player_id=victim, detail=injury_label,
-                    inflicter_id=meta.get("by"),
+                    inflicter_id=inflicter,
                     reason=meta.get("reason"),
                     was_blitz=is_blitz_now,
                     blitz_target_id=victim if is_blitz_now else None,
@@ -255,12 +261,15 @@ def extract_events(replay: dict[str, Any]) -> list[Event]:
             elif mid == "teamResultSetBadlyHurtSuffered" and side in ("home", "away"):
                 bh_victim = _bh_victim(send_box, victim_excluded=victim)
                 meta = send_box.get(bh_victim or "", {}) if bh_victim else {}
+                inflicter = meta.get("by")
+                if not inflicter and current_action and current_action.lower() in ("block", "blitz", "blitzmove", "foul"):
+                    inflicter = acting_player_id
                 events.append(Event(
                     kind="badly_hurt", side=side, command_nr=cn,
                     half=half, turn=event_turn,
                     score_home=score_home, score_away=score_away,
                     player_id=bh_victim,
-                    inflicter_id=meta.get("by"),
+                    inflicter_id=inflicter,
                     reason=meta.get("reason"),
                     was_blitz=is_blitz_now,
                     blitz_target_id=bh_victim if is_blitz_now else None,

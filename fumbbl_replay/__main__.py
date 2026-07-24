@@ -74,6 +74,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="Voice for the chosen TTS backend (default per backend; env: FUMBBL_TTS_VOICE)")
     parser.add_argument("--tts-meme", action="store_true",
                         help="Use af_nicole (ASMR-style) as the voice — comedy mode")
+    parser.add_argument("--kill", action="store_true",
+                        help="Only show kill (RIP) events in the report")
     parser.add_argument("--verbose", "-v", action="store_true")
     args = parser.parse_args(argv)
 
@@ -217,7 +219,8 @@ def main(argv: list[str] | None = None) -> int:
             out["commentary"] = {str(k): v for k, v in commentary_lines.items()}
         print(json.dumps(out, indent=2))
     else:
-        print(analyzer.format_report(analysis, commentary=commentary_lines))
+        print(analyzer.format_report(analysis, commentary=commentary_lines,
+                                       only_kills=args.kill))
 
     if (args.tableaux or args.gifs) and replay is None:
         log.warning("--tableaux/--gifs require the replay event log; skipping (--no-replay was set)")
